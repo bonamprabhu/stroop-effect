@@ -1,0 +1,246 @@
+---
+title: 'Statistics: The Science of Decisions'
+output:
+  html_document: default
+  html_notebook: default
+  pdf_document: default
+  word_document: default
+---
+<h2 style="color:#0959a5">_Statistical Analysis of Stroop Effect_</h2>
+
+###Background on Stroop Effect
+
+The Stroop effect is a psychological occurrence which was first described by [John Ridley Stroop](https://en.wikipedia.org/wiki/John_Ridley_Stroop) in the article "Studies of interference in serial verbal reactions" (1935) Stroop J.R. Journal of Experimental Psychology 18: 643-622. It is a demonstration of interference in reaction time of a task.
+
+###Design of Experiment
+
+In a stroop task participants are presented with a list of words, with each word displayed in a colour of ink. The participants task is to say out loud the *colour of the ink* in which the word is printed. The task has two conditions:
+
+* _Congruent_ words condition:
+The words being displayed are colour words whose names match the colour in which they are printed, for example <span style="color:#FF0000">RED</span>, <span style="color:#0000FF">BLUE</span>.  
+* _Incongruent_ words condition:
+The words being displayed are colour words whose names do not match the colour in which they are printed, for example <span style="color:#008000">PURPLE</span>, <span style="color:#800080">ORANGE</span>.  
+
+In each case, the time taken by each participant to name the colour of the ink is measured and recorded.
+
+Experimental design used is <span style="color:#C71585">within-subject design</span> as the same participant is exposed to more than one condition.
+
+###Identifying the variables
+
+The experimental setup of the given stroop task varies the conditions of the task, namely, _Congruent_ words condition and _Incongruent_ words condition and measures the time taken by each participant to complete the task. Thus, the independent and dependent variables are as follows:
+
+* __Independent Variable:__ Whether the printed word and colour of the ink are the same or different (_Congruent_ or _Incongruent_)
+* __Dependent Variable:__ Time taken to name the colour of the ink of a list of words (_Reaction Time_)
+
+###Formulating hypotheses (H~o~ and H~a~)
+
+We can formulate a non-directional set of hypotheses or a directional set of hypotheses.
+
+<span style="color:#C70039">__Non-Directional__</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+**H~o~:** The true population mean difference in Reaction time for the test conditions (i.e. _Congruent_ and _Incongruent_ condition) is equal to zero.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$\mu$~difference~$=0$ or $\mu$~incongruent~$=\mu$~congruent~  
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+**H~a~:** The true population mean difference in Reaction time for the test conditions is not equal to zero.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$\mu$~difference~$\ne0$ or $\mu$~incongruent~$\neq\mu$~congruent~  
+
+<span style="color:#C70039">__Directional__</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+**H~o~:** The true population mean difference in Reaction time for the test conditions is less than or equal to zero.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$\mu$~difference~$\leq0$ or $\mu$~incongruent~$\leq\mu$~congruent~  
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+**H~a~:** The true population mean difference in Reaction time for the test conditions is greater than zero.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$\mu$~difference~$>0$ or $\mu$~incongruent~$>\mu$~congruent~  
+
+where,  
+$\mu$~incongruent~ = Population mean reaction time for incongruent condition,  
+$\mu$~congruent~ = Population mean reaction time for congruent condition,  
+$\mu$~difference~ = $\mu$~incongruent~$-\mu$~congruent~
+
+The advantage of using a directional hypothesis is in increased power to detect the specific effect we are interested in. The disadvantage is that there is no power to detect an effect in the opposite direction. 
+
+###Statistical significance test
+
+The selection of a statistal significance test depends on following factors:
+
+1. __Number of samples:__  
+Since the number of samples in the experiment described above is equal to 2, we can either do a two sample z-test or a two sample t-test.
+
+2. __Sample size:__  
+If the sample size is large enough (>30), we can calculate an estimate of the population standard deviation from sample and perform a z-test. But if the sample size is small (<30) then our estimate of population standard deviation from sample may not be a good estimate. So, we go for a t-test.
+
+3. __Design of Experiment:__  
+Since the experiment described above is designed to be within-subject, we need to perform either a two sample _dependent_ z-test or a two sample _dependent_ t-test depending on the sample size.
+
+####Read in the data
+
+```{r}
+stroop_data <- read.csv("stroopdata.csv")
+str(stroop_data)
+head(stroop_data)
+```
+
+The data is structured in 24 rows and 2 columns. Each row corresponds to a participant while each column corresponds to a test condition. So, each row is an observation for a given participant.
+
+####Summary Statistics
+
+```{r, include=FALSE}
+require(reshape)
+```
+
+```{r}
+d <- setNames(as.data.frame(rbind(cbind(stroop_data$Congruent,"Congruent"),
+                         cbind(stroop_data$Incongruent,"Incongruent"))),
+              c("task.completion.time","condition"))
+
+d$task.completion.time <- as.numeric(as.character(d$task.completion.time))
+
+stats <- as.data.frame(
+    list(
+      Min = tapply(d$task.completion.time, d$condition, min),
+      Median = tapply(d$task.completion.time, d$condition, median),
+      Mean = tapply(d$task.completion.time, d$condition, mean),
+      Max = tapply(d$task.completion.time, d$condition, max),
+      StdDev = tapply(d$task.completion.time, d$condition, sd),
+      Variance = tapply(d$task.completion.time, d$condition, var)
+    )
+)
+stats['Range'] = stats['Max'] - stats['Min']
+stats
+```
+
+####Data Visualization
+
+```{r, include=FALSE}
+require(ggplot2)
+```
+
+```{r}
+p <- ggplot(d, aes(x = condition, y = task.completion.time))
+
+
+p +
+  geom_boxplot(aes(fill = condition), alpha = 0.5, notch = TRUE) +
+  xlab("Condition") +
+  ylab(paste("Reaction Time","(in seconds)",sep = '\n')) +
+  theme(axis.title = element_text(face = "bold", size = 12, colour = "darkslategrey"),
+        axis.text = element_text(size = 12)) + guides(fill=FALSE)
+```
+
+The boxplot indicates that the median reaction time for incongruent condition is greater than that of congruent condition. And, since the notches for the two boxes do not overlap, the difference between the medians can be described as <span style="color:#4682B4">_statistically significant at a level of significance of 0.05_</span>. It also indicates that there are two outliers in incongruent condition.
+
+The data can also be visualized as a density plot or a histogram.
+
+```{r}
+p +
+  geom_histogram(aes(x = task.completion.time, y = ..density.., fill = condition),
+                 alpha = 0.5, position = 'identity', bins = 20) +
+  geom_density(aes(x = task.completion.time, y = ..density..,
+                   color = condition),
+               alpha = 0,
+               size = 1) +
+  xlim(c(0,50)) + xlab("Reaction Time (in seconds)") + ylab("Relative frequency") +
+  theme(axis.title = element_text(face = "bold", size = 12, colour = "darkslategrey"),
+        axis.text = element_text(size = 12),
+        legend.title = element_blank())
+```
+
+####Significance test
+
+Since the sample size of our data is less than 30, we will perform a two sample dependent t-test and we will test the directional set of hypotheses.
+
+__1. Calculate difference in reaction time for each paricipant__
+```{r}
+stroop_data['diff'] <- stroop_data$Incongruent - stroop_data$Congruent
+head(stroop_data)
+```
+
+__2. Test for normality__
+```{r}
+par(mfcol = c(1,2))
+boxplot(stroop_data$diff,
+        main = "Boxplot of Difference",
+        ylab = "[Incongruent] - [Congruent]")
+qqnorm(stroop_data$diff)
+qqline(stroop_data$diff)
+```
+
+The boxplot and the QQ plot indicates that there is some skew, but mostly the plot shows normality.
+
+__3. t-Test__
+```{r}
+alpha = 0.01                                         #Significance level
+
+n <- 24                                              #Sample size
+df <- n-1                                            #Degrees of freedom
+
+t_c = qt(alpha, df)                                  #t-critical value
+
+x_bar <- sum(stroop_data$diff)/n                     #Mean difference in reaction time
+sigma <- sqrt((sum((stroop_data$diff-x_bar)^2))/df)  #StdDev of difference in rection time
+
+se <- sigma/sqrt(n)                                  #Standard error
+
+t <- (x_bar-0)/se                                    #t-Statistic
+p <- 2*pt(q = -abs(t), df = df)                      #p-value
+
+cat("t-statistic:",t,'\n',"t-critical:",abs(t_c))
+```
+
+```{r}
+x = seq(-3.5, 4.5, length=10^3)
+y = dt(x, df)
+
+ggplot() +
+  geom_area(aes(x = x, y = y), fill = "blue", alpha = 0.2) +
+  geom_area(aes(x = x[x>abs(t_c)], y = y[x>abs(t_c)]), alpha = 0.5) +
+  annotate('text', x = 2, y = 0.35,
+           label = paste("italic(t[list(alpha==",alpha,",df==",df,",)~1~tail])"),
+           parse = TRUE, size=5, alpha = 0.8) +
+  annotate('text', x = 3, y = 0.05,
+           label = paste("italic(t[critical]==+", round(abs(t_c),2),")"),
+           parse = TRUE, size=3.5, alpha = 0.8) +
+  annotate('text', x = 2.6, y = 0.3,
+           label = paste("italic(list(t(",df,")==",round(t,2),",p==",round(p,10),",one-tailed))"),
+           parse = TRUE, size=3.5, alpha = 0.8)
+```
+
+####Results
+
+```{r}
+CI <- x_bar + abs(t_c)*se                 #99% Confidence Interval
+
+cat("Paired t(",df,")=",round(t,2),", p=",round(p,10),", one-tailed",'\n',
+    "One-sided Confidence interval on the mean difference; 99% CI = (",round(CI,2),",",Inf,")\n",sep = "")
+```
+
+Since our t-statistic lies in the region of rejection, at a confidence level of 99%, we reject the null hypothesis, H~o~. The results match up with the expectation.
+
+####Conclusion
+
+```{r}
+d <- x_bar/stats$Mean['Congruent']
+cat("Participants averaged ",round(d*100,2),"% longer to name ink colours of incongruent words.",sep = "")
+```
+
+We conclude that the _cognitive ability to read words interferes with the cognitive ability to identify colours_. One possible explanation to the observed data can be that _word processing happens much faster in our brain than colour processing_.
+
+Since the original study, the Stroop effect has been investigated in a variety of ways. One general finding is that the Stroop effect is very robust. For example, the Stroop effect extends to colour-related words (e.g. sky and fire). It extends to non-words that sound like colour words (e.g. wred and bloo). It occurs with the words that are presented suboptimally (dim, faded, small, etc.).
+
+###Reference
+
+* [Background on Stroop Effect](https://www.rit.edu/cla/gssp400/sbackground.html)
+* [Stroop effect, Wikipedia](https://en.wikipedia.org/wiki/Stroop_effect)
+* [Notched Box Plots](https://sites.google.com/site/davidsstatistics/home/notched-box-plots)
+* [Paired sample t-test in R](https://heuristically.wordpress.com/2011/09/28/paired-sample-t-test-in-r/)
+* [The Student t Distribution in R](https://www.math.ucla.edu/~anderson/rw1001/library/base/html/TDist.html)
+* [Expression in R](http://www.ats.ucla.edu/stat/r/pages/greek_letters.htm)
+* [Using annotate function in R](http://stackoverflow.com/questions/15125628/putting-mathematical-symbols-and-subscripts-mixed-with-regular-letters-in-r-ggpl)
