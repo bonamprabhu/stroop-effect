@@ -222,7 +222,7 @@ cat("Paired t(",df,")=",round(t,2),", p=",round(p,10),", one-tailed",'\n',
     "One-sided Confidence interval on the mean difference; 99% CI = (",round(CI,2),",",Inf,")\n",sep = "")
 ```
 
-Since our t-statistic lies in the region of rejection, at a confidence level of 99%, we reject the null hypothesis, H~o~. The results match up with the expectation.
+Since our t-statistic lies in the critical region, we reject the null hypothesis in favor of the alternative hypothesis at a significance level of 1%. The result of the test is inline with the expectation.
 
 ####Conclusion
 
