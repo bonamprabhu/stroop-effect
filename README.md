@@ -9,7 +9,7 @@ Want to add an alternative statistical analysis? Contributions are welcome!
 
 First, fork this repository.
 
-![Fork Icon](images/fork-icon.png)
+![Fork Icon](images/fork.png)
 
 Next, clone this repository to your desktop to make changes.
 
@@ -20,7 +20,7 @@ $ cd stroop-effect
 
 Once you've pushed changes to your local repository, you can issue a pull request by clicking on the pull request button.
 
-![Pull Request Icon](images/pull-request-icon.png)
+![Pull Request Icon](images/pull-request.png)
 
 ## License
 
