@@ -1,7 +1,6 @@
 # Statistical analysis of Stroop Effect
 
-Statistics is the science of decisions. This project aims to analyze statistical significance of a psychological occurrence called 
-Stroop Effect by analysing data collected from an experiment. It illustrates the steps involved in statistical analysis.
+Statistics is the science of decisions. This project aims to analyze statistical significance of a psychological occurrence called Stroop Effect by analysing data collected from an experiment. It illustrates the steps involved in statistical analysis. Follow this [link](http://htmlpreview.github.io/?https://github.com/bonamprabhu/stroop-effect/blob/master/statistical-analysis.html) to view the HTML output.
 
 ## Try out the experiment
 
